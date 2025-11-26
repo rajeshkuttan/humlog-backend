@@ -73,8 +73,14 @@ async fn main() {
         .layer(cors)
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
-    println!("🚀 HUMLOG Backend running on ws://{}/ws", addr);
+    // Use PORT from environment (for Render) or default to 8080
+    let port = std::env::var("PORT")
+        .ok()
+        .and_then(|p| p.parse().ok())
+        .unwrap_or(8080);
+    
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+    println!("🚀 HUMLOG Backend running on port {} (ws://0.0.0.0:{}/ws)", port, port);
     
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app).await.unwrap();
